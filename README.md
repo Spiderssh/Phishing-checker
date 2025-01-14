@@ -37,8 +37,8 @@ This tool can also validate URLs anonymously using a headless browser with proxy
 ## Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Spiderssh/phishing-checker.git
-   cd phishing-checker
+   git clone https://github.com/Spiderssh/Phishing-checker.git
+   cd Phishing-checker
    ```
 2. Install dependencies:
    ```bash
