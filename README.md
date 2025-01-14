@@ -18,22 +18,6 @@ This tool can also validate URLs anonymously using a headless browser with proxy
 
 ---
 
-## Requirements
-1. **Python** (>= 3.7)
-2. **Pip**: Ensure Python dependencies can be installed.
-3. **Selenium**: For headless browsing.
-   ```bash
-   pip install selenium
-   ```
-4. **Google Chrome** and **ChromeDriver**:
-   - Download ChromeDriver matching your Chrome version from [ChromeDriver Downloads](https://sites.google.com/chromium.org/driver/).
-   - Place it in your system's PATH or provide its absolute path in the script.
-5. **TOR Proxy**:
-   - Install and configure TOR for anonymous browsing.
-   - Ensure TOR is running on `127.0.0.1:9050`.
-
----
-
 ## Installation
 1. Clone the repository:
    ```bash
