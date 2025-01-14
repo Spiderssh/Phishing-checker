@@ -9,6 +9,22 @@ This tool can also validate URLs anonymously using a headless browser with proxy
 
 ---
 
+## Requirements
+1. **Python** (>= 3.7)
+2. **Pip**: Ensure Python dependencies can be installed.
+3. **Selenium**: For headless browsing.
+   ```bash
+   pip install selenium
+   ```
+4. **Google Chrome** and **ChromeDriver**:
+   - Download ChromeDriver matching your Chrome version from [ChromeDriver Downloads](https://sites.google.com/chromium.org/driver/).
+   - Place it in your system's PATH or provide its absolute path in the script.
+5. **TOR Proxy**:
+   - Install and configure TOR for anonymous browsing.
+   - Ensure TOR is running on `127.0.0.1:9050`.
+  
+     ---
+     
 ## Features
 - Detects phishing indicators in URLs.
 - Supports anonymous URL validation via Selenium and a TOR proxy.
@@ -26,8 +42,41 @@ This tool can also validate URLs anonymously using a headless browser with proxy
    ```
 2. Install dependencies:
    ```bash
-   pip install -r requirements.txt
+   pip install selenium
+   sudo apt install tor -y
+   sudo nano /etc/tor/torrc
+   SocksPort 127.0.0.1:9050
+   ControlPort 9051
    ```
+   Save the file and exit (Ctrl+O, Enter, Ctrl+X).
+   ```bash
+   sudo systemctl start tor
+   sudo systemctl enable tor
+   sudo systemctl status tor
+   ```
+   Verify that Tor is functioning correctly with the curl command
+   ```bash
+   curl --socks5-hostname 127.0.0.1:9050 http://check.torproject.org
+   ```
+   Use Tor as a Proxy
+To route traffic through Tor, you can configure SOCKS
+
+SOCKS5 Proxy: 127.0.0.1:9050
+Control Port: 127.0.0.1:9051
+
+Install proxychains
+```bash
+sudo apt install proxychains4 -y
+```
+
+Edit the proxychains configuration
+```bash
+sudo nano /etc/proxychains4.conf
+```
+Add the proxy details
+```bash
+socks5  127.0.0.1 9050
+```
 
 ---
 
