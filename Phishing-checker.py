@@ -25,7 +25,7 @@ def is_phishing_url(url):
     ]
 
     suspicious_tlds = [
-        '.xyz', '.click', '.top', '.tk', '.ml', '.ga', '.cf', '.gq'
+        '.xyz', '.click', '.top', '.tk', '.ml', '.ga', '.cf', '.gq','[.]com','.beauty','.buzz','.shop','.cf','.cn','.trycloudflare.com','.dad','.zip','.mov','.nexus','.club','.icu','.host','.ru','.ru<','.wang','gq','.ml'
     ]
 
     # Check for phishing indicators in the URL path or query parameters
