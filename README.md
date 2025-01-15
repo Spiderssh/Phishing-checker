@@ -22,7 +22,17 @@ This tool can also validate URLs anonymously using a headless browser with proxy
 5. **TOR Proxy**:
    - Install and configure TOR for anonymous browsing.
    - Ensure TOR is running on `127.0.0.1:9050`.
-  
+6. **Tkinter**:
+   - Ensure Tkinter is installed for GUI support. On Linux, install it via:
+   ```bash
+   sudo apt-get install python3-tk
+   ```
+8. **Stem**:
+   - Install the required Python libraries:
+     ```bash
+     pip install stem requests
+     ```
+
      ---
      
 ## Features
