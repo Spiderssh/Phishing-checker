@@ -95,14 +95,14 @@ socks5  127.0.0.1 9050
 ### CLI Mode
 Run the script in CLI mode:
 ```bash
-python phishing-checker.py
+python Phishing-checker.py
 ```
 Follow the prompts to enter URLs one by one. Type `done` to finish and view the results.
 
 ### GUI Mode
 Run the script in GUI mode:
 ```bash
-python phishing-checker.py --gui
+python Phishing-checker.py --gui
 ```
 A window will open where you can enter and analyze URLs.
 
