@@ -10,6 +10,10 @@ This tool can also validate URLs anonymously using a headless browser with proxy
 ---
 
 ## Requirements
+**To install the dependancies safely use controlled environment**
+```bash
+source env/bin/activate
+```
 1. **Python** (>= 3.7)
 2. **Pip**: Ensure Python dependencies can be installed.
 3. **Selenium**: For headless browsing.
@@ -34,7 +38,7 @@ This tool can also validate URLs anonymously using a headless browser with proxy
      ```
 8. **Required Libraries**
    ```bash
-   pip install requests beautifulsoup4 selenium
+   pip install beautifulsoup4
    ```
      ---
      
