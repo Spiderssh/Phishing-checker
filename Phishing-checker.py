@@ -4,11 +4,103 @@
 import re
 import os
 import sys
+import requests
+from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
 from tkinter import Tk, Label, Button, Entry, StringVar
+
+TOR_PROXY = "socks5h://127.0.0.1:9050"
+
+def configure_tor_session():
+    """
+    Configure a TOR session for anonymous HTTP requests.
+
+    Returns:
+        requests.Session: A configured session object.
+    """
+    session = requests.Session()
+    session.proxies = {
+        "http": TOR_PROXY,
+        "https": TOR_PROXY,
+    }
+    return session
+
+def analyze_url_tor(url):
+    """
+    Analyze a URL for malicious activity via a TOR connection.
+
+    Args:
+        url (str): The URL to analyze.
+
+    Returns:
+        dict: Analysis results including page behavior and reputation.
+    """
+    session = configure_tor_session()
+    results = {
+        "url": url,
+        "safe": True,
+        "reason": "No malicious activity detected.",
+    }
+
+    try:
+        # Fetch the page content
+        response = session.get(url, timeout=10)
+        if response.status_code == 200:
+            # Check for suspicious keywords in content
+            soup = BeautifulSoup(response.content, "html.parser")
+            title = soup.title.string if soup.title else ""
+            if any(keyword in title.lower() for keyword in ["login", "verify", "auth", "secure"]):
+                results["safe"] = False
+                results["reason"] = "Suspicious keywords found in page title."
+
+            # Additional checks for redirection or malformed content
+            if "meta http-equiv='refresh'" in str(soup).lower():
+                results["safe"] = False
+                results["reason"] = "Page contains redirection behavior."
+
+        else:
+            results["safe"] = False
+            results["reason"] = f"HTTP error code: {response.status_code}"
+
+    except Exception as e:
+        results["safe"] = False
+        results["reason"] = f"Error during analysis: {str(e)}"
+
+    return results
+
+def selenium_tor_analysis(url):
+    """
+    Perform deeper analysis using Selenium over a TOR proxy.
+
+    Args:
+        url (str): The URL to analyze.
+
+    Returns:
+        str: Result of the analysis.
+    """
+    try:
+        options = Options()
+        options.add_argument("--headless")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--proxy-server=socks5://127.0.0.1:9050")  # Use TOR proxy
+
+        service = Service('/path/to/chromedriver')  # Update with the path to your ChromeDriver
+        driver = webdriver.Chrome(service=service, options=options)
+        driver.get(url)
+
+        # Check for suspicious content or redirections
+        if "login" in driver.title.lower() or "auth" in driver.title.lower():
+            driver.quit()
+            return "THIS LINK IS NOT SAFE: Contains suspicious keywords in title."
+
+        driver.quit()
+        return "This link is safe."
+
+    except Exception as e:
+        return f"Error during Selenium analysis: {str(e)}"
 
 def is_phishing_url(url):
     """
@@ -24,50 +116,11 @@ def is_phishing_url(url):
         'login', 'secure', 'account', 'verify', 'webscr', 'update', 'auth', 'signin'
     ]
 
-    suspicious_tlds = [
-        '.xyz', '.click', '.top', '.tk', '.ml', '.ga', '.cf', '.gq','[.]com','.beauty','.buzz','.shop','.cf','.cn','.trycloudflare.com','.dad','.zip','.mov','.nexus','.club','.icu','.host','.ru','.ru<','.wang','gq','.ml'
-    ]
-
     # Check for phishing indicators in the URL path or query parameters
     if any(indicator in url.lower() for indicator in phishing_indicators):
         return True
 
-    # Check if the URL uses a suspicious top-level domain (TLD)
-    if any(url.lower().endswith(tld) for tld in suspicious_tlds):
-        return True
-
     return False
-
-def check_url_safety(url):
-    """
-    Validate the legitimacy of the URL by loading it anonymously.
-
-    Args:
-        url (str): The URL to check.
-
-    Returns:
-        str: Result message indicating whether the link is safe or not.
-    """
-    try:
-        options = Options()
-        options.add_argument('--headless')
-        options.add_argument('--no-sandbox')
-        options.add_argument('--disable-dev-shm-usage')
-        options.add_argument('--proxy-server=socks5://127.0.0.1:9050')  # Use TOR proxy for anonymity
-
-        service = Service('/path/to/chromedriver')  # Update with the path to your ChromeDriver
-        driver = webdriver.Chrome(service=service, options=options)
-        driver.get(url)
-
-        # Verify if the page loaded successfully (no redirection or errors)
-        if "error" in driver.title.lower() or "not found" in driver.title.lower():
-            return "THIS LINK IS NOT SAFE"
-
-        driver.quit()
-        return "This link is safe"
-
-    except Exception as e:
-        return f"THIS LINK IS NOT SAFE ({str(e)})"
 
 def analyze_urls(urls):
     """
@@ -77,14 +130,15 @@ def analyze_urls(urls):
         urls (list): A list of URLs to analyze.
     """
     for url in urls:
-        if is_phishing_url(url):
-            print(f"\033[91m{url} -> THIS LINK IS NOT SAFE\033[0m")  # Red color
+        tor_results = analyze_url_tor(url)
+        if not tor_results["safe"]:
+            print(f"\033[91m{url} -> {tor_results['reason']}\033[0m")  # Red color
         else:
-            safety_check = check_url_safety(url)
-            if "safe" in safety_check.lower():
-                print(f"\033[92m{url} -> {safety_check}\033[0m")  # Green color
+            selenium_results = selenium_tor_analysis(url)
+            if "safe" in selenium_results.lower():
+                print(f"\033[92m{url} -> {selenium_results}\033[0m")  # Green color
             else:
-                print(f"\033[91m{url} -> {safety_check}\033[0m")  # Red color
+                print(f"\033[91m{url} -> {selenium_results}\033[0m")  # Red color
 
 def cli_mode():
     """
@@ -114,14 +168,15 @@ def gui_mode():
     def analyze():
         url = url_input.get()
         if url:
-            if is_phishing_url(url):
-                result_label.config(text="THIS LINK IS NOT SAFE", fg="red")
+            tor_results = analyze_url_tor(url)
+            if not tor_results["safe"]:
+                result_label.config(text=tor_results['reason'], fg="red")
             else:
-                safety_check = check_url_safety(url)
-                if "safe" in safety_check.lower():
-                    result_label.config(text="This link is safe", fg="green")
+                selenium_results = selenium_tor_analysis(url)
+                if "safe" in selenium_results.lower():
+                    result_label.config(text=selenium_results, fg="green")
                 else:
-                    result_label.config(text=safety_check, fg="red")
+                    result_label.config(text=selenium_results, fg="red")
 
     root = Tk()
     root.title("Phishing URL Checker")
