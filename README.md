@@ -26,13 +26,16 @@ This tool can also validate URLs anonymously using a headless browser with proxy
    - Ensure Tkinter is installed for GUI support. On Linux, install it via:
    ```bash
    sudo apt-get install python3-tk
-   ```
-8. **Stem**:
+
+7. **Stem**:
    - Install the required Python libraries:
      ```bash
      pip install stem requests
      ```
-
+8. **Required Libraries**
+   ```bash
+   pip install requests beautifulsoup4 selenium
+   ```
      ---
      
 ## Features
